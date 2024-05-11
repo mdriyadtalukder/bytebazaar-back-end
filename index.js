@@ -30,10 +30,47 @@ async function run() {
 
 
 
+        const usersCollection = client.db("bytebazaar").collection("users");
         const reviewsCollection = client.db("bytebazaar").collection("reviews");
         const allLaptopsCollection = client.db("bytebazaar").collection("all-laptops");
         const cartCollection = client.db("bytebazaar").collection("cart");
         const favoriteCollection = client.db("bytebazaar").collection("favorites");
+        const likesCollection = client.db("bytebazaar").collection("likes");
+        const dislikesCollection = client.db("bytebazaar").collection("dislikes");
+
+
+
+
+
+
+        // add  users by checking user is in collection or not
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const query = { email: user.email }
+            const existingUser = await usersCollection.findOne(query);
+            if (existingUser) {
+                return res.send({ message: 'user already exist!', insertedId: null })
+            }
+
+            const result = await usersCollection.insertOne(user);
+            res.send(result);
+
+        })
+        
+        // Get users
+        app.get('/users', async (req, res) => {
+            const result = await usersCollection.find().toArray();
+            res.send(result);
+        });
+
+        //delete user
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await usersCollection.deleteOne(query);
+            res.send(result);
+        })
+
 
 
         // Get home reviews
@@ -41,8 +78,6 @@ async function run() {
             const result = await reviewsCollection.find().toArray();
             res.send(result);
         });
-
-
 
 
         // Get all laptops
@@ -402,6 +437,77 @@ async function run() {
         })
 
 
+        // add to like 
+        app.post('/likes', async (req, res) => {
+            const item = req.body;
+            const result = await likesCollection.insertOne(item);
+            res.send(result);
+        })
+        // search like by email query
+        app.get('/likes', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email }
+            const result = await likesCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        //laptop  add like quantity by edit
+        app.patch('/all_laptops/:id', async (req, res) => {
+            const laptop = req.body;
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    productLikes: laptop.productLikes,
+
+                }
+            }
+            const result = await allLaptopsCollection.updateOne(query, updatedDoc)
+            res.send(result)
+        })
+        //delete like
+        app.delete('/likes/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await likesCollection.deleteOne(query);
+            res.send(result);
+        })
+
+
+        // add to dislike 
+        app.post('/dislikes', async (req, res) => {
+            const item = req.body;
+            const result = await dislikesCollection.insertOne(item);
+            res.send(result);
+        })
+        // search dislike by email query
+        app.get('/dislikes', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email }
+            const result = await dislikesCollection.find(query).toArray();
+            res.send(result);
+        })
+        //laptop  add like quantity by edit
+        app.patch('/all_laptop/:id', async (req, res) => {
+            const laptop = req.body;
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    productUnlikes: laptop.productUnlikes,
+
+                }
+            }
+            const result = await allLaptopsCollection.updateOne(query, updatedDoc)
+            res.send(result)
+        })
+        //delete dislike
+        app.delete('/dislikes/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await dislikesCollection.deleteOne(query);
+            res.send(result);
+        })
 
 
 
