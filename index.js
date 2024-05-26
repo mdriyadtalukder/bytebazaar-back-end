@@ -380,6 +380,21 @@ async function run() {
             res.send(result)
         })
 
+        //decrease laptop quantity
+        app.patch('/descreaselaptops/:id', async (req, res) => {
+            const laptop = req.body;
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    productQuantity: laptop.productQuantity,
+
+                }
+            }
+            const result = await allLaptopsCollection.updateOne(query, updatedDoc)
+            res.send(result)
+        })
+
 
         //delete laptop
         app.delete('/alllaptops/:id', async (req, res) => {
@@ -598,7 +613,7 @@ async function run() {
 
         app.post('/create-payment-intent', async (req, res) => {
             const { price } = req.body;
-            const amount = parseInt(price * 100);
+            const amount = parseInt(price);
             console.log(amount, 'amount inside the intent')
 
             const paymentIntent = await stripe.paymentIntents.create({
@@ -616,9 +631,6 @@ async function run() {
 
         app.get('/payment/:email', verifyToken, async (req, res) => {
             const query = { email: req.params.email }
-            if (req.params.email !== req.decoded.email) {
-                return res.status(403).send({ message: 'forbidden access' });
-            }
             const result = await paymentCollection.find(query).toArray();
             res.send(result);
         })
