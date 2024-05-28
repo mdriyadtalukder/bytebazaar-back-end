@@ -122,6 +122,14 @@ async function run() {
             res.send(result);
         });
 
+        // search user by email query
+        app.get('/user', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email }
+            const result = await usersCollection.find(query).toArray();
+            res.send(result);
+        })
+
         //delete user
         app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
@@ -634,6 +642,12 @@ async function run() {
             const result = await paymentCollection.find(query).toArray();
             res.send(result);
         })
+
+        // Get all payment
+        app.get('/payments', async (req, res) => {
+            const result = await paymentCollection.find().toArray();
+            res.send(result);
+        });
 
         app.post('/payment', async (req, res) => {
             const payment = req.body;
