@@ -665,6 +665,29 @@ async function run() {
             res.send({ result, deleteResult });
         })
 
+        //payment status edit
+        app.patch('/payment/:id', async (req, res) => {
+            const payment = req.body;
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    status: payment.status,
+
+                }
+            }
+            const result = await paymentCollection.updateOne(query, updatedDoc)
+            res.send(result)
+        })
+
+        //delete payment
+        app.delete('/payment/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await paymentCollection.deleteOne(query);
+            res.send(result);
+        })
+
         //---------------------------------------------------------------------------
 
         // Send a ping to confirm a successful connection
