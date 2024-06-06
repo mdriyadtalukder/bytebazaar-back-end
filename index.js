@@ -121,6 +121,20 @@ async function run() {
             res.send(result);
         })
 
+        //make seller
+        app.patch('/users/seller/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    role: 'seller',
+                }
+
+            }
+            const result = await usersCollection.updateOne(query, updatedDoc);
+            res.send(result);
+        })
+
         // Get users
         app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
             const result = await usersCollection.find().toArray();
@@ -649,7 +663,7 @@ async function run() {
         })
 
         // Get all payment
-        app.get('/payments', verifyToken, verifyAdmin, async (req, res) => {
+        app.get('/payments', async (req, res) => {
             const result = await paymentCollection.find().toArray();
             res.send(result);
         });
