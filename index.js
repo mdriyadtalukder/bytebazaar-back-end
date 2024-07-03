@@ -48,7 +48,35 @@ async function run() {
         const checkoutCollection = client.db("bytebazaar").collection("checkout");
         const paymentCollection = client.db("bytebazaar").collection("payment");
 
+        //-----------add seller id----------------------------------------------------------------------------
 
+        // Retrieve all users
+        // const users = await allLaptopsCollection.find({}).toArray();
+
+        // Update roles based on the position
+        // for (let i = 0; i < users.length; i++) {
+        //     let role;
+        //     if (i < 40) {
+        //         sellerID = 'si120';
+        //     } else if (i < 80) {
+        //         sellerID = 'si121';
+        //     } else {
+        //         sellerID = 'si122';
+        //     }
+
+        //     const query = { _id: new ObjectId(users[i]._id) };
+        //     const updatedDoc = {
+        //         $set: {
+        //             sellerID: sellerID,
+        //         }
+        //     };
+
+        //     await allLaptopsCollection.updateOne(query, updatedDoc);
+
+        // }
+        // console.log("Roles updated successfully");
+
+        //-----------------------------------------------------------------------------------------------------------------
 
         //-----------------------jwt related api--------------------------------------------------
 
