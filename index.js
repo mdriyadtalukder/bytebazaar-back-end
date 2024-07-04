@@ -47,6 +47,8 @@ async function run() {
         const dislikesCollection = client.db("bytebazaar").collection("dislikes");
         const checkoutCollection = client.db("bytebazaar").collection("checkout");
         const paymentCollection = client.db("bytebazaar").collection("payment");
+        const coinsProductsCollection = client.db("bytebazaar").collection("coinsProducts");
+        const coinsCollection = client.db("bytebazaar").collection("coins");
 
         //-----------add seller id----------------------------------------------------------------------------
 
@@ -503,6 +505,12 @@ async function run() {
 
 
 
+        // Get coin's product
+        app.get('/coinsProducts', async (req, res) => {
+            const result = await coinsProductsCollection.find().toArray();
+            res.send(result);
+        });
+
 
         // add to cart 
         app.post('/cart', async (req, res) => {
@@ -873,6 +881,27 @@ async function run() {
                         const q = { _id: checkout[0]?._id }
                         await checkoutCollection.deleteOne(q);
 
+                        // add and update coins
+                        const querie = { email: paymentData?.email }
+                        const existingUser = await coinsCollection.findOne(querie);
+                        if (existingUser) {
+                            const queryy = { _id: new ObjectId(existingUser?._id) }
+                            const updatedDocs = {
+                                $set: {
+                                    coins: Number(existingUser.coins) + (Number(data.amount) / 1000),
+
+                                }
+                            }
+                            await coinsCollection.updateOne(queryy, updatedDocs)
+                        }
+                        else {
+                            await coinsCollection.insertOne({
+                                email: paymentData?.email,
+                                coins: Number(data.amount) / 1000
+                            });
+                        }
+
+
 
 
 
@@ -924,6 +953,36 @@ async function run() {
 
 
         //-------------------------------------------------------------------------------
+
+        // add to coins 
+        app.post('/coins', async (req, res) => {
+            const item = req.body;
+            const result = await coinsCollection.insertOne(item);
+            res.send(result);
+        })
+
+        // search coins by email query
+        app.get('/coins', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email }
+            const result = await coinsCollection.findOne(query);
+            res.send(result);
+        })
+
+        //coins edit
+        app.patch('/coins/:id', async (req, res) => {
+            const coin = req.body;
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    coins: Number(coin.coins),
+
+                }
+            }
+            const result = await coinsCollection.updateOne(query, updatedDoc)
+            res.send(result)
+        })
 
 
 
