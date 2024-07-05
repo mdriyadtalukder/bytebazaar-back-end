@@ -49,6 +49,7 @@ async function run() {
         const paymentCollection = client.db("bytebazaar").collection("payment");
         const coinsProductsCollection = client.db("bytebazaar").collection("coinsProducts");
         const coinsCollection = client.db("bytebazaar").collection("coins");
+        const recordsCoinsCollection = client.db("bytebazaar").collection("recordsCoins");
 
         //-----------add seller id----------------------------------------------------------------------------
 
@@ -510,6 +511,21 @@ async function run() {
             const result = await coinsProductsCollection.find().toArray();
             res.send(result);
         });
+
+        //decrease laptop quantity
+        app.patch('/coinsProducts/:id', async (req, res) => {
+            const product = req.body;
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    Quantity: product.Quantity,
+
+                }
+            }
+            const result = await coinsProductsCollection.updateOne(query, updatedDoc)
+            res.send(result)
+        })
 
 
         // add to cart 
@@ -986,6 +1002,33 @@ async function run() {
 
 
 
+        // post coin purchase
+        app.post('/recordsCoins', async (req, res) => {
+            const item = req.body;
+            const result = await recordsCoinsCollection.insertOne(item);
+            res.send(result);
+        })
+        // Get users coin purchase
+        app.get('/recordsCoins', async (req, res) => {
+            const result = await recordsCoinsCollection.find().toArray();
+            res.send(result);
+        });
+
+        // search user coin purchase by email query
+        app.get('/recordCoin', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email }
+            const result = await recordsCoinsCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        //delete user coin purchase
+        app.delete('/recordsCoins/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await recordsCoinsCollection.deleteOne(query);
+            res.send(result);
+        })
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
