@@ -1022,6 +1022,21 @@ async function run() {
             res.send(result);
         })
 
+        //user coin purchase status edit
+        app.patch('/recordsCoins/:id', async (req, res) => {
+            const product = req.body;
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    status: product.status,
+
+                }
+            }
+            const result = await recordsCoinsCollection.updateOne(query, updatedDoc)
+            res.send(result)
+        })
+
         //delete user coin purchase
         app.delete('/recordsCoins/:id', async (req, res) => {
             const id = req.params.id;
