@@ -852,7 +852,7 @@ async function run() {
                         cartIds: paymentData?.cartIds,
                         menuItemIds: paymentData?.menuItemIds,
                         cartItems: paymentData?.cartItems,
-                        status: 'Accepted',
+                        status: 'Pending',
                         method: paymentData?.method
                     };
 
